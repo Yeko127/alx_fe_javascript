@@ -45,7 +45,9 @@ function createAddQuoteForm() {
     addButton.addEventListener("click", function (){
         addQuote();
     });
-
+    container.appendChild(textInput);
+    container.appendChild(categoryInput);
+    container.appendChild(addButton);
 }
 
  createAddQuoteForm();
