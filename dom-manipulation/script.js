@@ -48,7 +48,7 @@ function filterQuotes() {
     if (!filterSelect) return;
 
     currentFilter = filterSelect.value;
-    localStorage.setItem('categoryFilter', currentFilter);
+    localStorage.setItem("categoryFilter", currentFilter);
 
     showRandomQuote();
 }
