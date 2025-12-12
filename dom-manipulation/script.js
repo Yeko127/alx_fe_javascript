@@ -68,7 +68,7 @@ async function postQuotesToServer(quotes) {
     }
 }
 
-async function syncWithServer() {
+async function syncQuotes() {
     const localAddedQuotes = quote.slice[3];
 
     await postQuotesToServer(localAddedQuotes);
@@ -79,21 +79,26 @@ async function syncWithServer() {
 
      if (hasConflict) {
         showConflictNotification();
-        return;
+        showSyncStatus(`Conflict: Server (${serverQuotes.length}) vs local(${localAddedQuotes.length})`, "warning");
+        return false;
      }
-     if (serverQuotes.length> 0) {
-        localAddedQuotes.push(...serverQuotes.filter(sq => !localAddedQuotes.some(1q.id === sq.id)
-    ));
-    quote = [...quote.slice(0,3), ...localAddedQuotes];
+     const newServerQuotes = serverQuotes.filter(sq =>
+        !localAddedQuotes.some(1q => 1q.id === sq.id)
+     );
+if (newServerQuotes.length > 0) {
+    quote.push (... newServerQuotes);
     savedQuotes();
     showRandomQuote();
-     }
+    showSyncStatus(`Synced ${newServerQuotes.length} new quotes`, 'success')
+    return true;
 }
+showSyncStatus ('Up to date', "success")
+return true;
 
 function startAutoSync () {
     syncInterval = setInterval (async () =>{
         await fetchServerQuotes();
-        await syncWithServer();
+        await syncQuotes();
     }, 30000); //sync every 30 seconds
 
     syncWithServer();
