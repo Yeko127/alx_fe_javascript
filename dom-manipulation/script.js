@@ -25,7 +25,7 @@ showRandomQuote();
 
 const API_BAse = 'https://jsonplaceholder.typicode.com/posts';
 
-async function fetchServerQuotes() {
+async function fetchQuotesFromServer() {
     try {
         const response = await fetch(API_Base);
         const posts = await response.json();
