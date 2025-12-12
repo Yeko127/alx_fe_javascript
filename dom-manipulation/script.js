@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function (){
 {text: "Love is a friendship set to music", category: "Love"}
 ];
 
-let currentFilter = "all";
+let selectedCategory = "all";
 
 //loads content from the local storage
 const savedQuotes = localStorage.getItem('quotes');
@@ -13,7 +13,7 @@ if (savedQuotes) {
     quote = [...quote, ...JSON.parse(savedQuotes)];
 }
 
-currentFilter = localStorage.getItem("categoryFilter") || "all";
+selectedCategory = localStorage.getItem("categoryFilter") || "all";
 
 // loads last viewed quote index from session storage
 const lastQuoteIndex = sessionStorage.getItem('lastQuoteIndex');
@@ -39,7 +39,7 @@ function populateCategories() {
         option.textContent = category;
         filterSelect.appendChild(option);
     });
-    filterSelect.value = currentFilter;
+    filterSelect.value = selectedCategory;
 }
 
 //filter and show quotes
@@ -48,7 +48,7 @@ function filterQuotes() {
     if (!filterSelect) return;
 
     currentFilter = filterSelect.value;
-    localStorage.setItem("categoryFilter", currentFilter);
+    localStorage.setItem("categoryFilter", selectedCategory);
 
     showRandomQuote();
 }
@@ -57,10 +57,10 @@ function showRandomQuote() {
     let filteredQuotes = quote;
 
     if (currentFilter !== "all") {
-        filteredQuotes = quote.filter(q => q.category === currentFilter);
+        filteredQuotes = quote.filter(q => q.category === selectedCategory);
     }
     if (filteredQuotes.length === 0) {
-        document.getElementById("quoteDisplay").innerHTML = `<em>No quotes found for "${currentFilter}" </em>`;
+        document.getElementById("quoteDisplay").innerHTML = `<em>No quotes found for "${selectedCategory}" </em>`;
         return;
     }
 
