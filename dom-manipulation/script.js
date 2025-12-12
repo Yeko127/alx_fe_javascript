@@ -13,7 +13,7 @@ function showRandomQuote() {
     const randomIndex = Math.floor(Math.random() * quote.length);
     const randomQuote = quote[randomIndex];
 
-    quoteDisplay.textContent = '"' + randomQuote.text + '" - ' + randomQuote.category;
+    quoteDisplay.innerHTML = `"${randomQuote.text}" - <strong>${randomQuote.category}</strong>`;
 }
 //attach event listener to button
 
@@ -32,19 +32,11 @@ function createAddQuoteForm() {
     const container = document.getElementById("addQuoteContainer");
     if (!container) return console.error("No elemnt with id 'addQuoteContainer' found.")
   
-    //input for quote text  
-    const textInput = document.createElement("Input");
-    textInput.type = "text";
-    textInput.placeholder = "Enter a new quote";
-    textInput.id = "newQuoteText";
-    textInput.style.marginRight = "10px";
-
-    //input for category
-    const categoryInput = document.createElement("input");
-    categoryInput.type = "text";
-    categoryInput.placeholder = "Enter quote category";
-    categoryInput.id = "newQuoteCategory";
-    categoryInput.style.marginRight = "10px";
+    container.innerHTML = `
+    <input type="text" id="newQuoteText" placeholder="Enter a new quote" />
+    <input type="text" id="newQuoteCategory" placeholder="Enter quote category" />
+    <button id="addQuoteBtn">Add Quote</button>
+  `;
 
     //add quote button
     const addButton = document.createElement("button");
@@ -54,10 +46,6 @@ function createAddQuoteForm() {
         addQuote();
     });
 
-    //append to container
-    container.appendChild(textInput);
-    container.appendChild(categoryInput);
-    container.appendChild(addButton);
 }
 
  createAddQuoteForm();
