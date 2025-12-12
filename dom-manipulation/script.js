@@ -27,8 +27,13 @@ const API_BAse = 'https://jsonplaceholder.typicode.com/posts';
 
 async function fetchQuotesFromServer() {
     try {
-        const response = await fetch(API_Base);
-        const posts = await response.json();
+        const response = await fetch(API_Base {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json'
+            }
+        });
+        const posts = await response.json();        
 
         serverQuotes = posts.slice(0, 10).map(post, index => ({
             id: post.id,
@@ -36,16 +41,40 @@ async function fetchQuotesFromServer() {
             category:['Inspirational', 'Motivation', 'Wisdom']
             [index % 3]
         }));
-        showSyncStatus('Synched with server', 'sucess');
+
+        showSyncStatus('Server quotes fetched', 'sucess');
         return serverQuotes;
     } catch (error) {
-        showSyncStatus('Sync failed- using local data', 'warning');
+        showSyncStatus('Failed to fetch server quotes', 'warning');
         return[];
     }    
+}
+async function postQuotesToServer(quotes) {
+    try {
+        const response = await fetch (API_BAse, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(quotes)
+        });
+        if (response.ok) {
+            showSyncStatus("Quotes posted to server", "Success");
+        } else {
+            showSyncStatus("POST failed", "warning");
+        }
+    } catch (error) {
+        showSyncStatus("POST error", "warning")
+    }
 }
 
 async function syncWithServer() {
     const localAddedQuotes = quote.slice[3];
+
+    await postQuotesToServer(localAddedQuotes);
+
+    await fetchQuotesFromServer();
+
      const hasConflict =serverQuotes.length !== localAddedQuotes.length;
 
      if (hasConflict) {
@@ -66,8 +95,10 @@ function startAutoSync () {
         await fetchServerQuotes();
         await syncWithServer();
     }, 30000); //sync every 30 seconds
-    fetchServerQuotes();
+
+    syncWithServer();
 }
+
 function stopAutoSync () {
     if (syncInterval) {
         clearInterval(syncInterval);
@@ -75,12 +106,11 @@ function stopAutoSync () {
     }
 }
 //manual sync button
-document.getElementById("syncNow").addEventListener("click", async () => {
-    stopAutoSync();
-    await fetchServerQuotes();
+document.getElementById("syncNow").addEventListener("click", stopAutoSync, async () => {
     await syncWithServer();
     startAutoSync();
 });
+
 //force local data conflict resolution
 document.getElementById("forceLocal").addEventListener("click", () => {
     localStorage.setItem('quotes', JSON.stringify(quote.slice(3)));
