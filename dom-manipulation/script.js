@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function (){
+document.addEventListener("DOMContentLoaded", function ()
     let quote = [
 {text: "The mind is everything. What you think you become.", category: "Inspirational"},
 {text: "Life is really simple, but we insist on making it complicated", category: "Life"},
@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", function (){
 ];
 
 let selectedCategory = "all";
+let syncInterval = null;
+let serverQuotes = [];
 
 //loads content from the local storage
 const savedQuotes = localStorage.getItem('quotes');
@@ -15,6 +17,106 @@ if (savedQuotes) {
 
 selectedCategory = localStorage.getItem("categoryFilter") || "all";
 
+//Initialize
+populateCategories();
+createAddQuoteForm();
+startAutoSync();
+showRandomQuote();
+
+const API_BAse = 'https://jsonplaceholder.typicode.com/posts';
+
+async function fetchServerQuotes() {
+    try {
+        const response = await fetch(API_Base);
+        const posts = await response.json();
+
+        serverQuotes = posts.slice(0, 10).map(post, index => ({
+            id: post.id,
+            text: post.title.substring(0, 100) + '...',
+            category:['Inspirational', 'Motivation', 'Wisdom']
+            [index % 3]
+        }));
+        showSyncStatus('Synched with server', 'sucess');
+        return serverQuotes;
+    } catch (error) {
+        showSyncStatus('Sync failed- using local data', 'warning');
+        return[];
+    }    
+}
+
+async function syncWithServer() {
+    const localAddedQuotes = quote.slice[3];
+     const hasConflict =serverQuotes.length !== localAddedQuotes.length;
+
+     if (hasConflict) {
+        showConflictNotification();
+        return;
+     }
+     if (serverQuotes.length> 0) {
+        localAddedQuotes.push(...serverQuotes.filter(sq => !localAddedQuotes.some(1q.id === sq.id)
+    ));
+    quote = [...quote.slice(0,3), ...localAddedQuotes];
+    savedQuotes();
+    showRandomQuote();
+     }
+}
+
+function startAutoSync () {
+    syncInterval = setInterval (async () =>{
+        await fetchServerQuotes();
+        await syncWithServer();
+    }, 30000); //sync every 30 seconds
+    fetchServerQuotes();
+}
+function stopAutoSync () {
+    if (syncInterval) {
+        clearInterval(syncInterval);
+        syncInterval = null;
+    }
+}
+//manual sync button
+document.getElementById("syncNow").addEventListener("click", async () => {
+    stopAutoSync();
+    await fetchServerQuotes();
+    await syncWithServer();
+    startAutoSync();
+});
+//force local data conflict resolution
+document.getElementById("forceLocal").addEventListener("click", () => {
+    localStorage.setItem('quotes', JSON.stringify(quote.slice(3)));
+    hideConflictNotification();
+});
+
+function showSyncStatus (message, type = "info") {
+    const statusDiv = document.getElementById("syncStatus");
+    statusDiv.textContent = message;
+    statusDiv.style.color = type === 'success'? '#28a745':type === 'warning' ? '#ffc107' : '#666';
+}
+
+function showConflictNotification() {
+    const quoteDisplay = document.getElementById ("quoteDisplay");
+    quoteDisplay.innerHTML += `
+    <div style="margin -top:15px:padding10px;background:#fff3cd;border-radius:5px;font-size:14px;">
+    <strong> Server Conflict Detected!</strong><br>
+    server has ${serverQuotes.length} quotes, local has ${quote.slice(3).length}.
+    <br><button id = "resolveServer" style ="margin-top:5px;padding5px
+    10px;background:#007bff;color;white;border:none;border-radius:3px;cursor:pointer;">
+    Accept Server Data </button>
+    </div>
+   `;
+   document.getElementById("resolveServer").addEventListener("click", async () => {
+    quote = [...quote.slice(0, 3), ...serverQuotes];
+    savedQuotes();
+    showRandomQuote();
+    hideConflictNotification();
+    showSyncStatus("Server data accepted", "success");
+   });
+}
+function hideConflictNotification (){
+    const conflictDiv = document.querySelector("#quoteDisplay div[style*'background:#fff3cd']");
+
+    if (conflictDiv) conflictDiv.remove();
+}
 // loads last viewed quote index from session storage
 const lastQuoteIndex = sessionStorage.getItem('lastQuoteIndex');
 
@@ -114,7 +216,7 @@ if (exportBtn) {
 //import JSON with validation
 const importFile = document.getElementById("importFile");
 if (importFile) {
-    importFile.addEventListener("change", function (event) {
+    importFile.addEventListener("change", function (event) 
         const file = event.target.files[0];
         if (!file) return;
 
@@ -188,6 +290,5 @@ function createAddQuoteForm() {
 
     showRandomQuote();
 }
-populateCategories();
-createAddQuoteForm();
+
  });
