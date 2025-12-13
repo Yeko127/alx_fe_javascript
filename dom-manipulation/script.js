@@ -92,7 +92,7 @@ if (newServerQuotes.length > 0) {
     showSyncStatus(`Synced ${newServerQuotes.length} new quotes`, 'success')
     return true;
 }
-showSyncStatus ('Up to date', "success")
+showSyncStatus ('Quote synced with server!', "success")
 return true;
 
 function startAutoSync () {
@@ -112,7 +112,7 @@ function stopAutoSync () {
 }
 //manual sync button
 document.getElementById("syncNow").addEventListener("click", stopAutoSync, async () => {
-    await syncWithServer();
+    await syncQuotes();
     startAutoSync();
 });
 
